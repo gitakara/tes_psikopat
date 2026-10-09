@@ -1,10 +1,10 @@
-# Dilema Kereta Absurd (Seberapa Psikopat Kamu?)
+# Seberapa Psikopat Kamu? (A Trolley Problem)
 
-Aplikasi web interaktif berbasis **HTML5 Canvas 2D** dan **Vanilla JavaScript** yang mensimulasikan eksperimen pikiran *Trolley Problem*. Proyek ini dibangun tanpa dependensi pustaka eksternal (*zero-dependency*) untuk memastikan eksekusi grafik yang presisi, performa tinggi, dan waktu muat minimal.
+Permainan web interaktif berbasis **HTML5 Canvas 2D** dan **Vanilla JavaScript** yang mensimulasikan eksperimen pikiran *Trolley Problem*. Proyek ini dibangun tanpa dependensi pustaka eksternal (*zero-dependency*) untuk memastikan eksekusi grafik yang presisi, performa tinggi, dan waktu muat minimal.
 
 ---
 
-## 🛠️ Spesifikasi Teknis & Arsitektur
+## Spesifikasi Teknis & Arsitektur
 
 * **Graphics Rendering Engine (Canvas 2D):**
   * Menggunakan HTML5 Canvas API untuk mengontrol *redrawing* linier pada setiap perubahan *state* dan *frame* animasi.
@@ -25,7 +25,7 @@ Aplikasi web interaktif berbasis **HTML5 Canvas 2D** dan **Vanilla JavaScript** 
 
 ---
 
-## 📂 Struktur Repositori
+## Struktur Repositori
 
 ```text
 ├── index.html            # Core HTML, CSS layout/styling, dan logika utama JavaScript
