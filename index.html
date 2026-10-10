@@ -15,6 +15,66 @@
             user-select: none;
         }
 
+        /* Gaya untuk area tombol di akhir game */
+        .end-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .btn-share {
+            background: #25d366; /* Warna hijau WhatsApp */
+            color: #ffffff;
+            border: 3px solid #000000;
+            border-radius: 12px;
+            padding: 10px 20px;
+            font-family: inherit;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 3px 3px 0px #000000;
+            transition: transform 0.08s ease;
+        }
+
+        .btn-share-x {
+            background: #000000; /* Warna hitam X/Twitter */
+            color: #ffffff;
+            border: 3px solid #000000;
+            border-radius: 12px;
+            padding: 10px 20px;
+            font-family: inherit;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 3px 3px 0px #000000;
+            transition: transform 0.08s ease;
+        }
+
+        .btn-restart {
+            background: #ffffff;
+            color: #000000;
+            border: 3px solid #000000;
+            border-radius: 12px;
+            padding: 10px 20px;
+            font-family: inherit;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 3px 3px 0px #000000;
+            transition: transform 0.08s ease;
+        }
+
+        .btn-share:hover, .btn-share-x:hover, .btn-restart:hover {
+            opacity: 0.9;
+        }
+
+        .btn-share:active, .btn-share-x:active, .btn-restart:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px #000000;
+        }
+
         body {
             font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
             background-color: #ffffff;
@@ -267,12 +327,12 @@
         </div>
 
         <div class="description-box" id="descriptionBox">
-            Waduh! Kereta maut sedang meluncur menuju 5 orang yang sedang terikat. Tapi jika kamu menarik tuas, kereta akan berbelok ke jalur sebelah yang akan menabrak 1 orang lainnya. Apa yang akan kamu lakukan?
+            Sebuah kereta melaju menuju ke arah 5 orang yang sedang terikat di jalur lurus. TARIK TUAS untuk menyelamatkan mereka, namun mengorbankan 1 orang di jalur lainnya. Apa yang akan kamu lakukan?
         </div>
 
         <div class="action-area" id="actionArea">
-            <button class="btn-main" onclick="makeChoice(true)">Tarik Tuas</button>
-            <button class="btn-main" onclick="makeChoice(false)">Biarkan Saja</button>
+            <button class="btn-main" onclick="makeChoice(true)">Tarik Tuas (Belok)</button>
+            <button class="btn-main" onclick="makeChoice(false)">Biarkan Saja (Lurus)</button>
         </div>
 
         <div class="result-panel" id="resultPanel">
@@ -290,9 +350,19 @@
     <div id="endScreen">
         <img src="ending2.svg" alt="Foto Selesai">
         <p id="finalSummary">
-            Permainan selesai.<br>
-            Jumlah korban = <span id="totalKorbanTeks">0</span> jiwa.
+            Anda telah menyelesaikan semua pertanyaan..!!!<br>
+             <br>
+            Sekarang saatnya melihat seberapa psikopat Anda.<br>
+             <br>
+            Jumlah korban = <span id="totalKorbanTeks">0</span> jiwa.<br>
+            <strong id="predikatTeks" style="display: block; margin-top: 15px; color: #d9534f;"></strong>
         </p>
+        
+        <div class="end-buttons">
+            <button class="btn-share" onclick="shareOnWhatsApp()">Bagikan di WhatsApp</button>
+            <button class="btn-share-x" onclick="shareOnX()">Bagikan di X</button>
+            <button class="btn-restart" onclick="restartGame()">Main Lagi</button>
+        </div>
     </div>
 
     <script>
@@ -318,93 +388,135 @@
         const levels = [
             {
                 title: "Level 1: Dilema Klasik",
-                desc: "Kereta maut sedang meluncur menuju 5 orang yang sedang terikat di jalur lurus. Tapi jika kamu MENARIK TUAS itu, kereta akan berbelok ke jalur sebelah dan akan menabrak 1 orang lainnya. Apa yang akan kamu lakukan?",
+                desc: "Sebuah kereta melaju menuju ke arah 5 orang yang sedang terikat di jalur lurus. TARIK TUAS untuk menyelamatkan mereka, namun mengorbankan 1 orang di jalur lainnya. Apa yang akan kamu lakukan?",
                 targetTop: "oneGuy",
                 targetBottom: "fiveGuys",
                 korbanAtas: 1,
                 korbanBawah: 5,
-                pullPct: 89
+                pullPct: 89,
+                namaAtas: "1 Orang", 
+                namaBawah: "5 Orang"
             },
             {
-                title: "Level 2: Dilema Kelompok",
-                desc: "Sekarang jika pilihannya adalah antara MENARIK TUAS untuk menyelamatkan 4 orang teman SMA atau MEMBIARKAN SAJA agar 5 orang teman kerjamu selamat, apa yang akan kamu pilih?",
+                title: "Level 2: Ayah Koruptor & Anak Koruptor",
+                desc: "Seorang koruptor kelas kakap sedang terikat di jalur atas, sedangkan di jalur lurus, anak si koruptor yang tengil dan sombong juga sedang terikat tak berdaya. Apa yang akan kamu lakukan?",
+                targetTop: "richGuy",
+                targetBottom: "enemy",
+                korbanAtas: 1,
+                korbanBawah: 1,
+                pullPct: 90,
+                namaAtas: "Ayah Koruptor",
+                namaBawah: "Anak si Koruptor"
+            },
+            {
+                title: "Level 3: Teman SMA & Teman Kuliah",
+                desc: "Sekarang kereta melaju menuju ke arah 4 orang teman SMA-mu yang sedang terikat di jalur lurus. Di jalur sebelah, teman-teman kuliahmu juga terikat di sana. Apa yang akan kamu lakukan?",
                 targetTop: "fiveGuys",
                 targetBottom: "fourguys",
                 korbanAtas: 5,
                 korbanBawah: 4,
-                pullPct: 35
+                pullPct: 35,
+                namaAtas: "Teman SMA", 
+                namaBawah: "Teman Kuliah"
             },
             {
-                title: "Level 3: Bestie vs Family",
-                desc: "Sekarang ayah, ibu dan adikmu yang sedang terikat di jalur lurus sana. Tapi jika kamu TARIK TUAS itu sekarang, kereta akan berbelok dan menabrak teman akrabmu yang paling sering kamu ajak curhat dan hangout di jalur lainnya. Apa pilihanmu?",
-                targetTop: "bestie",
+                title: "Level 4: Bayi & Keluarganya",
+                desc: "Oh tidak, ada bayi yang baru lahir terjatuh di jalur atas, sedangkan keluarga si bayi sedang terikat di jalur lurus. Jika kamu hanya bisa menyelamatkan salah satunya, apa keputusanmu?",
+                targetTop: "baby",
                 targetBottom: "family",
                 korbanAtas: 1,
                 korbanBawah: 3,
-                pullPct: 78
+                pullPct: 18,
+                namaAtas: "Bayi",
+                namaBawah: "Keluarga Bayi"
             },
             {
-                title: "Level 4: Pengangguran vs Aki-Aki Jompo",
-                desc: "Jika pilihannya sekarang adalah MEMBIARKAN kereta lewat untuk menyelamatkan pemuda-pemuda pengangguran vs MENARIK TUAS itu untuk menyelamatkan nyawa lima orang kakek-kakek jompo. Apa yang akan kamu lakukan?",
+                title: "Level 5: Bestie & Family",
+                desc: "Sekarang teman akrabmu yang paling sering kamu ajak curhat dan nongkrong sedang terikat di jalur lurus. Di jalur sebelah, ada keluargamu juga sedang terikat di sana. Apa pilihanmu?",
+                targetTop: "family",
+                targetBottom: "bestie",
+                korbanAtas: 3,
+                korbanBawah: 1,
+                pullPct: 22,
+                namaAtas: "Keluarga",
+                namaBawah: "Teman Akrab"
+            },
+            {
+                title: "Level 6: Pengangguran & Orang Jompo",
+                desc: "Jika pilihannya sekarang adalah MEMBIARKAN SAJA kereta lewat untuk mengorbankan lima orang kakek-kakek jompo, atau MENARIK TUAS untuk menyelamatkan pemuda-pemuda pengangguran di komplek rumahmu, apa yang akan kamu lakukan?",
                 targetTop: "fiveGuys",
                 targetBottom: "grandpa",
                 korbanAtas: 5,
                 korbanBawah: 5,
-                pullPct: 48
+                pullPct: 48,
+                namaAtas: "Pengangguran",
+                namaBawah: "Aki-Aki Jompo"
             },
             {
-                title: "Level 5: Kucing Kesayanganmu vs Keponakan",
+                title: "Level 7: Kucing Kesayangan & Keponakan",
                 desc: "Sekarang mana yang akan kamu pilih? TARIK TUAS itu untuk menyelamatkan keponakanmu yang baru lahir atau BIARKAN SAJA agar kucing kesayanganmu tetap aman menyeberang?",
                 targetTop: "cat",
                 targetBottom: "baby",
                 korbanAtas: 1,
                 korbanBawah: 1,
-                pullPct: 82
+                pullPct: 82,
+                namaAtas: "Kucing Kesayangan",
+                namaBawah: "Keponakan"
             },
             {
-                title: "Level 6: Tetangga Julid vs 5 Jompo",
-                desc: "Jika kamu MEMBIARKAN SAJA, Kereta akan menabrak 5 orang jompo yang terikat di jalur lurus. Jika kamu MENARIK TUAS itu, kereta akan berbelok dan menabrak 1 tetangga julid yang suka gosipin dan jelek-jelekin kamu. Apa yang akan kamu pilih?",
-                targetTop: "enemy",
-                targetBottom: "grandpa",
-                korbanAtas: 1,
-                korbanBawah: 5,
-                pullPct: 91
+                title: "Level 8: Tetangga Julid & Jompo",
+                desc: "Jika kamu BIARKAN SAJA, kereta akan menabrak tetangga julid yang suka gosipin dan jelek-jelekin kamu di lingkungan RT. Sedangkan jika kamu TARIK TUAS, kereta akan berbelok dan menabrak 5 kakek-kakek yang tidak sengaja terikat di jalur atas. Apa yang akan kamu pilih?",
+                targetTop: "grandpa",
+                targetBottom: "enemy",
+                korbanAtas: 5,
+                korbanBawah: 1,
+                pullPct: 9,
+                namaAtas: "Kakek-Kakek",
+                namaBawah: "Tetangga Julid"
             },
             {
-                title: "Level 7: Tanpa Hambatan",
+                title: "Level 9: Tanpa Hambatan",
                 desc: "Jika jalanan di depanmu benar-benar kosong, apa yang akan kamu lakukan? MENARIK TUAS sambil mengatakan PRAANNKK!!! ke masinisnya, atau BIARKAN SAJA?",
                 targetTop: "none",
                 targetBottom: "none",
                 korbanAtas: 0,
                 korbanBawah: 0,
-                pullPct: 12
+                pullPct: 12,
+                namaAtas: "none",
+                namaBawah: "none"
             },
             {
-                title: "Level 8: Anak Pejabat Songong",
-                desc: "Seorang anak pejabat yang 'sotoy', tengil dan hobby ngebully sedang terikat di jalur lurus. Sedangkan di jalur atasnya, kosong. Kamu bisa menyelamatkan anak tengil itu dengan MENARIK TUAS-nya. Apa yang akan kamu lakukan?",
-                targetTop: "none",
-                targetBottom: "badguy",
-                korbanAtas: 0,
-                korbanBawah: 1,
-                pullPct: 95
+                title: "Level 10: Anak Pejabat Songong",
+                desc: "Seorang anak pejabat yang tengil, arogan dan sok jago sedang terikat di jalur atas. Sedangkan di jalur lurus, kosong tanpa hambatan. Kamu bisa menyelamatkan anak tengil itu dengan MENARIK TUAS-nya. Apa yang akan kamu lakukan?",
+                targetTop: "badguy",
+                targetBottom: "none",
+                korbanAtas: 1,
+                korbanBawah: 0,
+                pullPct: 5,
+                namaAtas: "Anak Pejabat",
+                namaBawah: "none"
             },
             {
-                title: "Level 9: Uang vs Keluarga",
-                desc: "Seorang milyader sedang terikat di jalur atas dan ia rela memberimu 10 miliar jika kamu TIDAK MENARIK TUASNYA. Tapi jika melakukan itu, maka keluargamu yang sedang terikat di jalur lainnya akan menjadi korbannya. Apa pilihanmu?",
+                title: "Level 11: Orang Kaya & Keluarga",
+                desc: "Seorang milyader sedang terikat di jalur atas dan ia rela memberimu 10 miliar jika kamu BIARKAN SAJA, tapi jika lakukan itu maka keluargamu yang sedang terikat di jalur lainnya akan menjadi korbannya. Apa pilihanmu?",
                 targetTop: "richGuy",
                 targetBottom: "family",
                 korbanAtas: 1,
                 korbanBawah: 3,
-                pullPct: 74
+                pullPct: 74,
+                namaAtas: "Milyader",
+                namaBawah: "Keluarga"
             },
             {
-                title: "Level 10: Ayah atau Ibu dan adik?",
-                desc: "Sekarang jika pilihannya adalah MEMBIARKAN KERETA LEWAT untuk menyelamatkan keluarga ayahmu, atau MENARIK TUAS untuk menyelamatkan keluarga ibumu yang ada di jalur lainnya. Mana yang akan kamu pilih?",
+                title: "Level 12: Keluarga Ayah atau Ibu?",
+                desc: "BIARKAN SAJA kereta tetap di jalur lurus agar keluarga dari ayahmu selamat dan mengorbankan keluarga dari ibumu. Apa keputusanmu?",
                 targetTop: "grandpa",
                 targetBottom: "family",
                 korbanAtas: 5,
                 korbanBawah: 3,
-                pullPct: 41
+                pullPct: 41,
+                namaAtas: "Keluarga Ayah",
+                namaBawah: "Keluarga Ibu"
             }
         ];
 
@@ -511,6 +623,36 @@
             }, 300);
         }
 
+// Fungsi Restart Game
+        function restartGame() {
+            playSound('click');
+            
+            // Sembunyikan layar selesai dan tampilkan kembali game utama
+            document.getElementById('endScreen').style.display = 'none';
+            document.getElementById('gameWrapper').style.display = 'flex';
+            document.body.style.padding = '20px';
+
+            // Reset ulang total korban dan mulai dari level 0
+            totalKorban = 0;
+            loadLevel(0);
+        }
+
+        // Fungsi Bagikan Hasil ke WhatsApp
+        function shareToWhatsApp() {
+            const predikat = document.getElementById('predikatTeks').innerText;
+            const text = `Aku baru aja main game 'Seberapa Psikopat Kamu?' dan dapet hasil:\n\n"Total Korban: ${totalKorban} jiwa (${predikat})"\n\nCoba mainin juga yuk!`;
+            const waUrl = `[https://api.whatsapp.com/send?text=$](https://api.whatsapp.com/send?text=$){encodeURIComponent(text)}`;
+            window.open(waUrl, '_blank');
+        }
+
+        // Fungsi Bagikan Hasil ke X (Twitter)
+        function shareToX() {
+            const predikat = document.getElementById('predikatTeks').innerText;
+            const text = `Aku baru aja main game 'Seberapa Psikopat Kamu?' dan dapet hasil: Total Korban ${totalKorban} jiwa (${predikat})! 😈`;
+            const xUrl = `[https://twitter.com/intent/tweet?text=$](https://twitter.com/intent/tweet?text=$){encodeURIComponent(text)}`;
+            window.open(xUrl, '_blank');
+        }
+
         function toggleSound() {
             isAudioMuted = !isAudioMuted;
             document.getElementById('muteBtn').innerText = isAudioMuted ? "Nyalakan SFX" : "Matikan SFX";
@@ -551,27 +693,45 @@
             // 3. Render Target Berdasarkan Level
             const lvl = levels[currentLevel];
             if (lvl) {
+                // Atur gaya font untuk nama sasaran
+                ctx.font = 'bold 16px "Comic Neue", cursive';
+                ctx.fillStyle = '#000000';
+                ctx.textAlign = 'center';
+
                 // Target Rel Atas
                 let topImg = svgAssets[lvl.targetTop];
                 if (topImg && topImg.complete) {
                     let w = 55, h = 55, x = 515, y = 45;
                     if (lvl.targetTop === 'cat') { w = 50; h = 40; y = 50; }
-                    else if (lvl.targetTop === 'fiveGuys' || lvl.targetTop === 'grandpa') { w = 100; h = 75; y = 35; }
+                    else if (lvl.targetTop === 'fiveGuys' || lvl.targetTop === 'grandpa' || lvl.targetTop === 'fourguys' || lvl.targetTop === 'family') { w = 100; h = 75; y = 35; }
+                    else if (lvl.targetTop === 'baby') { w = 35; h = 35; y = 45; }
                     ctx.drawImage(topImg, x, y, w, h);
+
+                // Render teks nama atas (posisi di atas gambar)
+                if (lvl.namaAtas) {
+                    ctx.fillText(lvl.namaAtas, x + (w / 2), y - 20);
                 }
+            }
 
                 // Target Rel Bawah
                 let bottomImg = svgAssets[lvl.targetBottom];
                 if (bottomImg && bottomImg.complete) {
                     let w = 90, h = 80, x = 480, y = 205;
-                    if (lvl.targetBottom === 'fiveGuys' || lvl.targetBottom === 'grandpa') { 
+                    if (lvl.targetBottom === 'fiveGuys' || lvl.targetBottom === 'grandpa' || lvl.targetBottom === 'fourguys' || lvl.targetBottom === 'family') { 
                         w = 125; h = 90; x = 465; y = 200; 
                     } else if (lvl.targetBottom === 'baby') { 
-                        w = 55; h = 55; x = 495; y = 220; 
+                        w = 45; h = 45; x = 495; y = 220; 
                     }
                     ctx.drawImage(bottomImg, x, y, w, h);
+
+                // Render teks nama bawah (posisi di bawah gambar)
+                if (lvl.namaBawah) {
+                    ctx.fillText(lvl.namaBawah, x + (w / 40), y + h + 20);
                 }
             }
+
+                ctx.textAlign = 'left';
+        }
 
             // 4. Pergerakan dan Rotasi Kereta
             let tx, ty, angle = 0;
@@ -584,20 +744,20 @@
                 angle = 0; 
             } else {
                 // Jalur Belok Atas
-                if (trolleyPos < 0.25) {
-                    // Fase 1: Masih di rel lurus sebelum belokan (Kemiringan 0)
+                if (trolleyPos < 0.35) {
+                    // Fase 1: Bergerak LURUS LEBIH PANJANG di rel bawah sebelum belok
                     tx = 20 + trolleyPos * 460;
                     ty = (10 + offsetY) + trolleyPos * 200;
                     angle = 0;
-                } else if (trolleyPos >= 0.25 && trolleyPos <= 0.60) {
-                    // Fase 2: Belok Menanjak ke Atas (Transisi miring perlahan sampai -0.35 radian)
-                    let progress = (trolleyPos - 0.25) / 0.35;
-                    tx = 135 + progress * 220;
-                    ty = (60 + offsetY) - progress * 50;
-                    angle = -0.35 * Math.sin(progress * Math.PI); // Smooth rotasi naik-turun
+                } else if (trolleyPos >= 0.35 && trolleyPos <= 0.70) {
+                    // Fase 2: Mulai Belok Menanjak (Mulai dari 0.35 sampai 0.70, rentang = 0.35)
+                    let progress = (trolleyPos - 0.35) / 0.35;
+                    tx = 181 + progress * 174; // Posisi X disesuaikan dari titik 0.35
+                    ty = (80 + offsetY) - progress * 70;
+                    angle = -0.70 * Math.sin(progress * Math.PI); // Kemiringan dibuat halus
                 } else {
-                    // Fase 3: Sudah sampai di rel atas (Kembali mendatar / angle = 0)
-                    let progress = (trolleyPos - 0.60) / 0.40;
+                    // Fase 3: Sudah sampai di rel atas (0.70 ke atas)
+                    let progress = (trolleyPos - 0.70) / 0.30;
                     tx = 355 + progress * 150;
                     ty = (10 + offsetY) - progress * 5;
                     angle = 0;
@@ -704,14 +864,52 @@
         function showEndScreen() {
             document.getElementById('gameWrapper').style.display = 'none';
             document.getElementById('totalKorbanTeks').innerText = totalKorban;
-            document.getElementById('endScreen').style.display = 'flex';
             
+            // Tentukan Gelar / Rangking berdasarkan Jumlah Korban
+            let predikat = "";
+            let warna = "#000000";
+
+            if (totalKorban === 0) {
+                predikat = "Rangking: Malaikat Penyelamat 😇";
+                warna = "#2bb24c"; // Hijau
+            } else if (totalKorban <= 10) {
+                predikat = "Rangking: Manusia Utilitarian ⚖️";
+                warna = "#337ab7"; // Biru
+            } else if (totalKorban <= 25) {
+                predikat = "Rangking: Agak Tegaan 😐";
+                warna = "#f0ad4e"; // Oranye
+            } else {
+                predikat = "Rangking: Psikopat Murni 🔪😈";
+                warna = "#d9534f"; // Merah
+            }
+
+            // Tampilkan Teks dan Warna ke Layar
+            const predikatEl = document.getElementById('predikatTeks');
+            predikatEl.innerText = predikat;
+            predikatEl.style.color = warna;
+
+            document.getElementById('endScreen').style.display = 'flex';
             document.body.style.padding = '0';
         }
 
         function nextLevel() {
             playSound('click');
             loadLevel(currentLevel + 1);
+        }
+
+        // Variable global untuk menyimpan teks hasil rangking
+        let finalPredikat = "";
+
+        // Fungsi untuk Restart Game
+        function restartGame() {
+            playSound('click');
+            // Sembunyikan layar akhir dan tampilkan kembali wrapper game
+            document.getElementById('endScreen').style.display = 'none';
+            document.getElementById('gameWrapper').style.display = 'flex';
+            
+            // Reset skor dan kembalikan ke level pertama
+            totalKorban = 0;
+            loadLevel(0);
         }
 
         window.onload = () => {
