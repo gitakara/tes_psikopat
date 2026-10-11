@@ -568,24 +568,118 @@
         let musicTimer = null;
 
         function preloadImages(sources, callback) {
-            let loaded = 0;
             const keys = Object.keys(sources);
             const total = keys.length;
+            let loaded = 0;
+
+            if (total === 0) {
+                callback();
+                return;
+            }
+
+            const finishOne = () => {
+                loaded++;
+                if (loaded === total) callback();
+            };
 
             keys.forEach(key => {
                 const img = new Image();
-                img.src = sources[key];
                 img.onload = () => {
-                    svgAssets[key] = img;
-                    loaded++;
-                    if (loaded === total) callback();
+                    // Jangan simpan aset yang ternyata gagal dimuat atau berdimensi nol.
+                    if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+                        svgAssets[key] = img;
+                    } else {
+                        delete svgAssets[key];
+                        console.warn(`Aset gambar tidak valid: ${sources[key]}`);
+                    }
+                    finishOne();
                 };
                 img.onerror = () => {
-                    svgAssets[key] = img; 
-                    loaded++;
-                    if (loaded === total) callback();
+                    // Asset yang gagal dimuat tidak boleh diteruskan ke ctx.drawImage().
+                    delete svgAssets[key];
+                    console.warn(`Aset gambar gagal dimuat: ${sources[key]}`);
+                    finishOne();
                 };
+                img.src = sources[key];
             });
+        }
+
+        // Pastikan gambar benar-benar berhasil dimuat sebelum digambar ke canvas.
+        function canDrawImage(img) {
+            return Boolean(img && img.complete && img.naturalWidth > 0 && img.naturalHeight > 0);
+        }
+
+        // Gambar pengganti sederhana jika file monalisa.svg tidak tersedia.
+        // Jika SVG asli berhasil dimuat, gambar pengganti ini tidak akan digunakan.
+        function drawMonaLisaFallback(x, y, w, h) {
+            ctx.save();
+            const frame = Math.max(3, Math.min(w, h) * 0.06);
+            ctx.fillStyle = '#5a3b20';
+            ctx.fillRect(x, y, w, h);
+            ctx.strokeStyle = '#2f2116';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(x + 1, y + 1, w - 2, h - 2);
+
+            const ix = x + frame;
+            const iy = y + frame;
+            const iw = w - frame * 2;
+            const ih = h - frame * 2;
+            ctx.fillStyle = '#82916a';
+            ctx.fillRect(ix, iy, iw, ih);
+            // Latar lanskap bergaya lukisan klasik.
+            ctx.fillStyle = '#b8ad7c';
+            ctx.beginPath();
+            ctx.moveTo(ix, iy + ih * 0.70);
+            ctx.quadraticCurveTo(ix + iw * 0.25, iy + ih * 0.48, ix + iw * 0.45, iy + ih * 0.68);
+            ctx.quadraticCurveTo(ix + iw * 0.72, iy + ih * 0.42, ix + iw, iy + ih * 0.62);
+            ctx.lineTo(ix + iw, iy + ih);
+            ctx.lineTo(ix, iy + ih);
+            ctx.closePath();
+            ctx.fill();
+
+            // Siluet kepala, rambut, tubuh, dan tangan pada potret.
+            ctx.fillStyle = '#29251f';
+            ctx.beginPath();
+            ctx.ellipse(ix + iw * 0.52, iy + ih * 0.36, iw * 0.22, ih * 0.29, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#d1ad83';
+            ctx.beginPath();
+            ctx.ellipse(ix + iw * 0.52, iy + ih * 0.37, iw * 0.15, ih * 0.23, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#29251f';
+            ctx.beginPath();
+            ctx.moveTo(ix + iw * 0.36, iy + ih * 0.31);
+            ctx.quadraticCurveTo(ix + iw * 0.30, iy + ih * 0.05, ix + iw * 0.52, iy + ih * 0.10);
+            ctx.quadraticCurveTo(ix + iw * 0.74, iy + ih * 0.06, ix + iw * 0.68, iy + ih * 0.32);
+            ctx.lineTo(ix + iw * 0.63, iy + ih * 0.23);
+            ctx.quadraticCurveTo(ix + iw * 0.49, iy + ih * 0.19, ix + iw * 0.38, iy + ih * 0.33);
+            ctx.closePath();
+            ctx.fill();
+            ctx.fillStyle = '#26362d';
+            ctx.beginPath();
+            ctx.moveTo(ix + iw * 0.27, iy + ih);
+            ctx.lineTo(ix + iw * 0.34, iy + ih * 0.63);
+            ctx.quadraticCurveTo(ix + iw * 0.52, iy + ih * 0.54, ix + iw * 0.69, iy + ih * 0.64);
+            ctx.lineTo(ix + iw * 0.80, iy + ih);
+            ctx.closePath();
+            ctx.fill();
+            ctx.fillStyle = '#d1ad83';
+            ctx.beginPath();
+            ctx.ellipse(ix + iw * 0.48, iy + ih * 0.73, iw * 0.15, ih * 0.055, -0.12, 0, Math.PI * 2);
+            ctx.ellipse(ix + iw * 0.58, iy + ih * 0.75, iw * 0.14, ih * 0.05, 0.12, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#30241d';
+            ctx.beginPath();
+            ctx.arc(ix + iw * 0.47, iy + ih * 0.36, Math.max(1.2, iw * 0.018), 0, Math.PI * 2);
+            ctx.arc(ix + iw * 0.57, iy + ih * 0.36, Math.max(1.2, iw * 0.018), 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#8d5e4b';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(ix + iw * 0.47, iy + ih * 0.46);
+            ctx.quadraticCurveTo(ix + iw * 0.52, iy + ih * 0.49, ix + iw * 0.57, iy + ih * 0.46);
+            ctx.stroke();
+            ctx.restore();
         }
 
         function initAudio() {
@@ -724,14 +818,14 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             // 1. Render Gambar Rel
-            if (svgAssets.track && svgAssets.track.complete) {
+            if (canDrawImage(svgAssets.track)) {
                 ctx.drawImage(svgAssets.track, 20, 20, 710, 340);
             }
 
             // 2. Render Karakter Pemain
             let youImg = isLeverPulled ? svgAssets.youPull : svgAssets.you;
             let px = 150, py = 210;
-            if (youImg && youImg.complete) {
+            if (canDrawImage(youImg)) {
                 ctx.drawImage(youImg, px, py, 90, 90);
             }
 
@@ -749,7 +843,7 @@
 
                 // Target Rel Atas
                 let topImg = svgAssets[lvl.targetTop];
-                if (topImg && topImg.complete) {
+                if (canDrawImage(topImg)) {
                     let w = 55, h = 55, x = 515, y = 45;
                     if (lvl.targetTop === 'cat') { w = 50; h = 40; y = 50; }
                     else if (lvl.targetTop === 'fiveGuys' || lvl.targetTop === 'grandpa' || lvl.targetTop === 'fourguys' || lvl.targetTop === 'family' || lvl.targetTop === 'fiveGuysSleeping') { w = 100; h = 75; y = 35; }
@@ -760,11 +854,16 @@
                 if (lvl.namaAtas) {
                     ctx.fillText(lvl.namaAtas, x + (w / 2), y - 20);
                 }
+            } else if (lvl.targetTop === 'monalisa') {
+                drawMonaLisaFallback(498, 35, 90, 80);
+                if (lvl.namaAtas) {
+                    ctx.fillText(lvl.namaAtas, 543, 15);
+                }
             }
 
                 // Target Rel Bawah
                 let bottomImg = svgAssets[lvl.targetBottom];
-                if (bottomImg && bottomImg.complete) {
+                if (canDrawImage(bottomImg)) {
                     let w = 90, h = 80, x = 480, y = 205;
                     if (lvl.targetBottom === 'fiveGuys' || lvl.targetBottom === 'grandpa' || lvl.targetBottom === 'fourguys' || lvl.targetBottom === 'family') { 
                         w = 125; h = 90; x = 465; y = 200; 
@@ -775,7 +874,16 @@
 
                 // Render teks nama bawah (posisi di bawah gambar)
                 if (lvl.namaBawah) {
-                    ctx.fillText(lvl.namaBawah, x + (w / 40), y + h + 20);
+                    ctx.fillText(lvl.namaBawah, x + (w / 2), y + h + 20);
+                }
+            } else if (lvl.targetBottom === 'monalisa') {
+                // Gambar potret pengganti agar level tetap tampil meski monalisa.svg gagal dimuat.
+                drawMonaLisaFallback(480, 205, 90, 80);
+                if (lvl.namaBawah) {
+                    ctx.font = 'bold 16px "Comic Neue", cursive';
+                    ctx.fillStyle = '#000000';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(lvl.namaBawah, 525, 305);
                 }
             }
 
@@ -814,7 +922,7 @@
             }
 
             // Render Kereta dengan Matriks Canvas Terisolasi
-            if (svgAssets.trolley && svgAssets.trolley.complete) {
+            if (canDrawImage(svgAssets.trolley)) {
                 let tw = 180, th = 130;
                 ctx.save();
                 ctx.translate(tx + tw / 2, ty + th / 2);
