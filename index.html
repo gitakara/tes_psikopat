@@ -397,7 +397,7 @@
                 korbanBawah: 5,
                 pullPct: 95,
                 namaAtas: "none", 
-                namaBawah: "5 orang"
+                namaBawah: "none"
             },
             {
                 title: "Level 2: 1 vs 5",
@@ -456,7 +456,7 @@
             },
             {
                 title: "Level 7: Pengangguran & Orang Jompo",
-                desc: "Jika pilihannya sekarang adalah MEMBIARKAN SAJA kereta lewat untuk mengorbankan lima orang kakek-kakek jompo, atau MENARIK TUAS untuk menyelamatkan pemuda-pemuda pengangguran di komplek rumahmu, apa yang akan kamu lakukan?",
+                desc: "Jika pilihannya sekarang adalah MEMBIARKAN SAJA kereta lewat untuk mengorbankan lima orang kakek-kakek jompo, atau MENARIK TUAS untuk menyelamatkan mereka dibanding para pengangguran di jalur sebelah, apa yang akan kamu lakukan?",
                 targetTop: "fiveGuys",
                 targetBottom: "grandpa",
                 korbanAtas: 5,
@@ -1026,13 +1026,13 @@
             let predikat = "";
             let warna = "#000000";
 
-            if (totalKorban === 21) {
+            if (totalKorban <= 21) {
                 predikat = "Rangking: Manusia Normal 😇";
                 warna = "#2bb24c"; // Hijau
             } else if (totalKorban <= 31) {
                 predikat = "Rangking: Manusia Utilitarian ⚖️";
                 warna = "#337ab7"; // Biru
-            } else if (totalKorban <= 41) {
+            } else if (totalKorban <= 36) {
                 predikat = "Rangking: Agak Tegaan 😐";
                 warna = "#f0ad4e"; // Oranye
             } else {
